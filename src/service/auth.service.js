@@ -68,7 +68,59 @@ export class AuthService extends BaseService {
       console.log(error);
     }
   }
+
+  async checkExists(userName,password){
+    try{
+      const {data} = await this.httpClient.get(`/user/login?userName=${userName}&password=${password}`);
+      return data;
+    }catch(error){
+      console.log(error);
+    }
+  }
   
+  //api la pathParam
+  async checkEmail(email){
+    try{
+      const {data} = await this.httpClient.get(`/user/email?email=${email}`);
+      return data;
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  //check username
+  async checkUserName(userName){
+    try{
+      const {data} = await this.httpClient.get(`/user/username?userName=${userName}`);
+      return data;
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  //create user
+  async createUser(user,role){
+    try{
+        const url = 'http://localhost:8088/user';
+        const response = await fetch(`${url}?role=${role}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+      } else {
+        console.error('Lỗi:', response.statusText);
+      }
+    }catch(error){
+      console.log(error);
+    }
+  }
+
   setToken(accessToken) {
     this.httpClient.setCustomConfigs({
       authentication: {
