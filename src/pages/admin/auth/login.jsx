@@ -8,7 +8,7 @@ function AdminLoginPage() {
   const [data,setData] = useState([]);
 
   useEffect(()=>{
-    setData(AuthService.loadUser());
+    // setData(AuthService.loadUser());
   },[]);
   console.log("data === ",data);
   const handleLogin = () => {

@@ -56,11 +56,11 @@ export const routes = [
   {
     path: '/admin/auth/login',
     component: AdminLoginPage,
-    layout: 'AuthenticationLayout',
+    layout: 'AdminLayout',
   },
   {
     path: '/admin/auth/register',
     component: AdminRegisterPage,
-    layout: 'AuthenticationLayout',
+    layout: 'AdminLayout',
   },
 ];

@@ -14,10 +14,12 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCartOutlined, SearchOutlined, Close, List } from '@mui/icons-material';
 import CartItem from './CartItem';
+import Cookies from 'js-cookie';
+import { authService } from '@/service/auth.service';
 
 const HeaderWrapper = styled(Box)(({ theme }) => ({
   maxWidth: 1240,
@@ -72,46 +74,48 @@ const CartWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const cartList = [
-  {
-    id: '1',
-    name: 'Giày Bóng Rổ Nam PEAK Outdoor Monster 8 High Top E224041A - Màu Tím Hồng',
-    size: 40,
-    price: 1200000,
-    color: 'Tím hồng',
-    image: 'https://peaksport.vn/wp-content/uploads/2023/03/13.jpg',
-  },
-  {
-    id: '2',
-    name: 'Giày Bóng Rổ Nam PEAK Outdoor Monster 8 High Top E224041A - Màu Tím Hồng',
-    size: 40,
-    price: 1200000,
-    color: 'Tím hồng',
-    image: 'https://peaksport.vn/wp-content/uploads/2023/03/13.jpg',
-  },
-  {
-    id: '3',
-    name: 'Giày Bóng Rổ Nam PEAK Outdoor Monster 8 High Top E224041A - Màu Tím Hồng',
-    size: 40,
-    price: 1200000,
-    color: 'Tím hồng',
-    image: 'https://peaksport.vn/wp-content/uploads/2023/03/13.jpg',
-  },
-];
+// const cartList = [
+//   {
+//     id: '1',
+//     name: 'Giày Bóng Rổ Nam PEAK Outdoor Monster 8 High Top E224041A - Màu Tím Hồng',
+//     size: 40,
+//     price: 1200000,
+//     color: 'Tím hồng',
+//     image: 'https://peaksport.vn/wp-content/uploads/2023/03/13.jpg',
+//   },
+//   {
+//     id: '2',
+//     name: 'Giày Bóng Rổ Nam PEAK Outdoor Monster 8 High Top E224041A - Màu Tím Hồng',
+//     size: 40,
+//     price: 1200000,
+//     color: 'Tím hồng',
+//     image: 'https://peaksport.vn/wp-content/uploads/2023/03/13.jpg',
+//   },
+//   {
+//     id: '3',
+//     name: 'Giày Bóng Rổ Nam PEAK Outdoor Monster 8 High Top E224041A - Màu Tím Hồng',
+//     size: 40,
+//     price: 1200000,
+//     color: 'Tím hồng',
+//     image: 'https://peaksport.vn/wp-content/uploads/2023/03/13.jpg',
+//   },
+// ];
 
 function HeaderLayout() {
   // check login
-  const isLoggedIn = false;
+  
+  const isLoggedIn = Cookies.get("accessToken");
 
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [isOpenCart, setIsOpenCart] = useState(false);
   const [isOpenSidebarOnMobile, setIsOpenSidebarOnMobile] = useState(false);
-
+  const [cartList,setCartList] = useState([]);
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseUserMenu = () => {
+    Cookies.remove('accessToken');
     setAnchorElUser(null);
   };
 
@@ -124,6 +128,19 @@ function HeaderLayout() {
 
   const theme = useTheme();
   const smDown = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const getDataFromLocalStorage = async () => {
+    const res = JSON.parse(localStorage.getItem("products"))||[];
+    let newProduct = []
+   for(const item of res){
+    let p = await authService.getProductById(item.idProduct);
+    newProduct =[...newProduct,p];
+   }
+  setCartList(newProduct);
+  };
+  useEffect(()=>{
+    getDataFromLocalStorage();
+  },[])
 
   return (
     <HeaderWrapper>

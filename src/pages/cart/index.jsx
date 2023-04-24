@@ -42,7 +42,7 @@ function CartPage(props) {
   const [product ,setProduct] = useState([]);
   const [quantityDefault,setQuantityDefault] = useState(1);
   const [quantityItem,setQuantityItem] = useState(0);
-  const [totalOrder,setTotalOrder] = useState([]);
+  const [totalOrder,setTotalOrder] = useState(0);
 
   //lay products tu localStorage va gan cho product
   const getDataFromLocalStorage = async () => {
@@ -98,11 +98,53 @@ function CartPage(props) {
     setQuantityItem(item.quantity);
   }
 
+  //xu li tong tien  hoa don
+  function changeTotalOrder(event){
+    const res = JSON.parse(localStorage.getItem("products"))||[];
+    let total = 0;
+    for(const item of res){
+      total = total + item.price * item.quantity;
+    }
+    console.log(total);
+    setTotalOrder(total);
+  }
+
   useEffect(() => {
     getDataFromLocalStorage();
   }, []);
 
+  useEffect(()=>{
+    changeTotalOrder();
+  },[product])
  
+  const handlePayment=async()=>{
+    //save invoice
+
+    const invoice = {
+     totalAmount: totalOrder 
+    }
+
+    const order = await authService.saveOrder(invoice);
+    console.log("order === ",order.id);
+
+    
+
+    //save invoicedetail
+    const res = JSON.parse(localStorage.getItem("products"))||[];
+    
+    for(const item of res){
+      let orderProduct = {
+        price:item.price,
+        quantity:item.quantity,
+        totalItem:item.price*item.quantity
+      }
+      const result = authService.saveOrderProduct(orderProduct,item.idProduct,order.id);
+      console.log("result === ",result);
+      
+    }
+
+
+  }
 
   return (
     <Box>
@@ -223,8 +265,7 @@ function CartPage(props) {
           <Box className="mt-10 flex flex-col gap-2">
             <Box className=" flex items-center justify-between">
               <p className="text-base ">Tạm tính:</p>
-              <p className="text-lg font-medium ">
-                2.480.000<span className="text-xl  font-semibold">₫</span>
+              <p className="text-lg font-medium ">{totalOrder}<span className="text-xl  font-semibold">₫</span>
               </p>
             </Box>
             <Box className=" flex items-center justify-between">
@@ -236,13 +277,13 @@ function CartPage(props) {
             <Box className=" flex items-center justify-between">
               <p className="text-base ">Vận chuyển:</p>
               <p className="text-lg font-medium ">
-                20.000<span className="text-xl  font-semibold">₫</span>
+                0<span className="text-xl  font-semibold">₫</span>
               </p>
             </Box>
             <Box className=" flex items-center justify-between">
               <p className="text-lg font-bold">Tổng tiền:</p>
               <p className="text-lg font-medium text-[#cc1e1e]">
-                2.500.000
+                {totalOrder}
                 <span className="text-xl text-[#cc1e1e] font-semibold">₫</span>
               </p>
             </Box>
@@ -251,7 +292,7 @@ function CartPage(props) {
             <Link to="/">
               <Button variant="outlined">Tiếp tục mua sắm</Button>
             </Link>
-            <Button variant="contained">Thanh toán</Button>
+            <Button variant="contained" onClick={handlePayment}>Thanh toán</Button>
           </Box>
         </Grid>
       </Grid>

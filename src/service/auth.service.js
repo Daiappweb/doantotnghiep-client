@@ -72,6 +72,7 @@ export class AuthService extends BaseService {
   async checkExists(userName,password){
     try{
       const {data} = await this.httpClient.get(`/user/login?userName=${userName}&password=${password}`);
+      console.log("data gui ve === ",data);
       return data;
     }catch(error){
       console.log(error);
@@ -119,6 +120,53 @@ export class AuthService extends BaseService {
     }catch(error){
       console.log(error);
     }
+  }
+
+  //save Order
+  async saveOrder(order){
+    try{
+      const url = 'http://localhost:8088/order';
+      const response = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(order)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } else {
+      console.error('Lỗi:', response.statusText);
+    }
+  }catch(error){
+    console.log(error);
+  }
+  }
+
+  async saveOrderProduct(orderProduct,productId,orderId){
+    try{
+      const url = 'http://localhost:8088/orderproduct';
+      const response = await fetch(`${url}?productId=${productId}&orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderProduct)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } else {
+      console.error('Lỗi:', response.statusText);
+    }
+  }catch(error){
+    console.log(error);
+  }
   }
 
   setToken(accessToken) {

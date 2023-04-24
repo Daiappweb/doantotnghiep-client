@@ -48,7 +48,7 @@ function ShoesDetailPage(shoes) {
     const product = await authService.getProductById(pId);
 
     if(index === -1){
-      products.push({ idProduct: pId, quantity: quantity,price:product.price});
+      products.push({ idProduct: pId, quantity: quantity,price:product.price,name:product.name,color:product.colors[0],size:product.sizes[0]});
     }else{
       products[index].quantity = quantity;
     }
