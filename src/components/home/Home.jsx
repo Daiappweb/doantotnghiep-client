@@ -3,7 +3,7 @@ import { Box, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Pagination
 import React, { useEffect, useState } from 'react';
 import { authService } from '@/service/auth.service';
 import { useParams } from 'react-router-dom';
-
+import { animateScroll as scroll } from 'react-scroll';
 function Home({params}) {
   const [filter, setFilter] = useState(1);
   const [data,setData] = useState([]);
@@ -24,6 +24,7 @@ function Home({params}) {
     }
   }
   const handleChangePage = (event,value)=>{
+    scroll.scrollToTop({ duration: 500, delay: 10 });
     setPage(value);
   }
 

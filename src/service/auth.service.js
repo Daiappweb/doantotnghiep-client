@@ -14,6 +14,16 @@ export class AuthService extends BaseService {
     }
     
   }
+
+  async loadOrders() {
+    try{
+      const { data } = await this.httpClient.get('/order');
+      return data;
+    }catch(error){
+      console.log(error);
+    }
+    
+  }
   
   async findEmail(){
     try{
@@ -36,6 +46,15 @@ export class AuthService extends BaseService {
   async getAllProdcuts(page,limit){
     try{
       const {data} = await this.httpClient.get(`/product?page=${page}&limit=${limit}`);
+      return data;
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  async getAllProdcuts(){
+    try{
+      const {data} = await this.httpClient.get(`/product`);
       return data;
     }catch(error){
       console.log(error);

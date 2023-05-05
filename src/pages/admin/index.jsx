@@ -1,7 +1,12 @@
+import { Typography,Box } from '@mui/material';
 import React from 'react';
 
 function AdminPage() {
-  return <div>AdminPage</div>;
+  return (
+    <Box>
+      <p>admin page</p>
+    </Box>
+  );
 }
 
 export default AdminPage;

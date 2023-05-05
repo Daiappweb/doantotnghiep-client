@@ -10,7 +10,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 import { Fragment } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, json, useNavigate } from "react-router-dom";
 import { authService } from "@/service/auth.service";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,7 @@ const loginFormSchema = z.object({
   username: z.string().min(6, "Địa chỉ email không hợp lệ."),
   password: z.string().min(8, "Mật khẩu phải có 8 ký tự trở lên."),
 });
+
 
 function LoginPage() {
   const { t } = useTranslation();
@@ -48,16 +49,22 @@ function LoginPage() {
     }
   };
   useEffect(() => {
-    console.log("role === ", role);
   }, [role]);
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
+    console.log("data === ",data);
+    console.log("role === ",role);
     const result = await authService.checkExists(data.username, data.password);
     if (result !== null && result !== undefined) {
       localStorage.setItem("user", JSON.stringify(result.user));
       Cookies.set("accessToken", result.accessToken);
-      navigate("/");
+      sessionStorage.setItem("user", JSON.stringify(result.user.userName));
+      if(role !== "AD"){
+        navigate("/");
+      }
+      if(role !== "CM"){
+        navigate("/admin");
+      }
       enqueueSnackbar("Đăng nhập thành công", {
         variant: "success",
       });

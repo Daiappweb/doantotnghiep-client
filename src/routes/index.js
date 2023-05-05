@@ -9,7 +9,6 @@ import CartPage from '@/pages/cart';
 import HomePage from '@/pages/home';
 import SearchPage from '@/pages/search';
 import ShoesDetailPage from '@/pages/shoes-detail';
-
 export const routes = [
   {
     path: '/',
@@ -51,7 +50,8 @@ export const routes = [
   {
     path: '/admin',
     component: AdminPage,
-    layout: 'AdminLayout',
+    // layout: 'AdminLayout',
+    layout:'MainAdminLayout',
   },
   {
     path: '/admin/auth/login',

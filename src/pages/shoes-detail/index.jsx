@@ -7,9 +7,12 @@ import {
   Button,
   TextField,
   Rating,
+  withStyles,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+
+
 
 const ShoesWrapper = styled(Grid)(() => ({
   background: "#fff",
@@ -18,7 +21,10 @@ const ShoesWrapper = styled(Grid)(() => ({
   width: "100%",
 }));
 
-function ShoesDetailPage(shoes) {
+
+
+
+function ShoesDetailPage(shoes,classes) {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
@@ -48,7 +54,15 @@ function ShoesDetailPage(shoes) {
     const product = await authService.getProductById(pId);
 
     if(index === -1){
-      products.push({ idProduct: pId, quantity: quantity,price:product.price,name:product.name,color:product.colors[0],size:product.sizes[0]});
+      products.push({ 
+        idProduct: pId, 
+        quantity: quantity,
+        price:product.price,
+        name:product.name,
+        color:product.colors[0],
+        size:product.sizes[0],
+        image:product.images[0].description
+      });
     }else{
       products[index].quantity = quantity;
     }
@@ -69,7 +83,7 @@ function ShoesDetailPage(shoes) {
   return (
     <Box>
       {product ? (
-        <ShoesWrapper container>
+        <ShoesWrapper container spacing={3}>
           <Grid item xs={12} sm={5}>
             <img src={product.images[0].description} alt="img" />
           </Grid>

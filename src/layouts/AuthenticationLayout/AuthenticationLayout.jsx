@@ -2,9 +2,12 @@ import { Box, styled } from '@mui/material';
 import { Stack } from '@mui/system';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import background from "../../assets/images/backgroud.jpg";
 const AuthWrapper = styled(Box)(() => ({
-  background: '#b2b8c8',
+  // background: '#b2b8c8',
+  backgroundImage: `url(${background})`,
+  backgroundSize: 'cover',
+  backgroundRepeat:'no-repeat',
   width: '100%',
   height: '100vh',
   display: 'flex',
@@ -14,7 +17,7 @@ const AuthWrapper = styled(Box)(() => ({
 }));
 
 const StyledBody = styled(Stack)(() => ({
-  backgroundColor: '#f5f5f5',
+  backgroundColor: '#ffffff',
   width: 600,
   height: 'auto',
   padding: 40,
