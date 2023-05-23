@@ -25,7 +25,6 @@ import { authService } from '@/service/auth.service';
 import { useState,useEffect,useMemo } from 'react';
 import { IoIosAddCircle } from "react-icons/io";
 import DialogApp from '@/components/dialog';
-import AddUserForm from '@/components/dialog/AddUserForm';
 import AddProductForm from '@/components/dialog/AddProductForm';
 
 function descendingComparator(a, b, orderBy) {
@@ -241,11 +240,12 @@ export default function Product(props) {
       sell,
     };
   }
+
  
   const loadProduct = async()=>{
     try{
       // const res = await authService.getAllImage();
-      const res = await authService.getAllProdcuts();
+      const res = await authService.getAllProdcut();
       const products = res.products;
       console.log("products ==== ",products);
       const rowRes = [];
@@ -261,13 +261,14 @@ export default function Product(props) {
       }
       console.log("products change === ",rowRes);
       setDataRow(rowRes);
+      handleChangePage(null, 0);
     }catch(error){
       console.log(error);
     }
   }
   useEffect(()=>{
     loadProduct();
-  },[]);
+  },[page,rowsPerPage ]);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -308,7 +309,10 @@ export default function Product(props) {
     setPage(newPage);
   };
 
+  
+
   const handleChangeRowsPerPage = (event) => {
+    console.log(event.target.value)
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };

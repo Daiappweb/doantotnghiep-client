@@ -227,7 +227,6 @@ export default function Order() {
       const rowRes = [];
       for (const item of orders) {
         const date = new Date(item.createdDate);
-        console.log("date === ", date);
         rowRes.push(
           createData(
             item.id,
