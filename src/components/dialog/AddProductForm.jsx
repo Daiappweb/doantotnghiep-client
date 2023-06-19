@@ -2,9 +2,6 @@ import {
   TextField,
   Grid,
   Typography,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
   Button,
   Stack,
   Select,
@@ -13,17 +10,33 @@ import {
   InputLabel,
   Autocomplete,
   OutlinedInput,
-  Chip,
   Box,
-  useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
 import { AiFillDelete } from "react-icons/ai";
 import { makeStyles } from "@material-ui/core";
 import { authService } from "@/service/auth.service";
 import { useEffect } from "react";
-import { convertLength } from "@mui/material/styles/cssUtils";
+// import {storage} from "../../../firebasecustom";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { v4 } from "uuid";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getStorage } from "firebase/storage";
+const firebaseConfig = {
+  apiKey: "AIzaSyCQXkScCsnzmQc7sECjXLafCwBcSD5t7qI",
+  authDomain: "uploadimage-82b9e.firebaseapp.com",
+  projectId: "uploadimage-82b9e",
+  storageBucket: "uploadimage-82b9e.appspot.com",
+  messagingSenderId: "929900882090",
+  appId: "1:929900882090:web:74010721ed19e8d42048d3",
+  measurementId: "G-V1LX3DX0PL",
+};
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const storage = getStorage(app);
 const useStyles = makeStyles({
   boxWrapper: {
     height: 500,
@@ -64,41 +77,51 @@ function AddProductForm(props) {
   const [colorSelect, setColorSelect] = useState("");
   const [sizeSelect, setSizeSelect] = useState([]);
   const [categorySelect, setCategorySelect] = useState([]);
-  
-  const handleSubmit = async (event) => {
-    
-    event.preventDefault();
-    const objectProduct = {
-      name: name,
-      code: code,
-      quantity: quantity,
-      price: priceImport,
-    };
+  const [iamgesrc, setImageSrc] = useState("");
+  const [des,setDes] = useState('');
 
+  const uploadFile = (iamgesrc) => {
+    if (iamgesrc == null) return;
+    const imageRef = ref(storage, `images/${iamgesrc.name + v4()}`);
+    uploadBytes(imageRef, iamgesrc).then((data) => {
+      console.log(data);
+      getDownloadURL(data.ref).then((url) => {
+        setImageSrc(url);
+      });
+    });
+  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     const sizeSend = [];
     const categorySend = [];
 
-    for(const item of sizeSelect){
+    for (const item of sizeSelect) {
       sizeSend.push(item.code);
     }
-    for(const item of categorySelect){
+    for (const item of categorySelect) {
       categorySend.push(item.code);
     }
-
-    const formData = new FormData();
-    const productSend = JSON.stringify(objectProduct);
-    formData.append('product', productSend);
-    formData.append("files",file);
-    formData.append("brand",brandSelect);
-    formData.append("color",colorSelect);
-    formData.append("size",sizeSend.join('-'));
-    formData.append("category",categorySend.join('-'));
-
-
-
-   const createProduct = await authService.createProduct(formData);
-   console.log("create product === ",createProduct);
+    let data = {
+      name: name,
+      code: code,
+      quantity: quantity,
+      importPrice:priceImport,
+      description:des,
+      price:priceSell,
+      inStock:quantity,
+      imageSrc: iamgesrc,
+      brand: {
+        id: brandSelect,
+      },
+      colors: [{ id: colorSelect }],
+      categories: categorySelect,
+      sizes: sizeSelect,
+      images: [],
+    };
+    console.log(data);
+    const createProduct = await authService.createProduct(data);
+    console.log("create product === ", createProduct);
   };
 
   const handleChangeBrand = (event) => {
@@ -109,6 +132,9 @@ function AddProductForm(props) {
   };
   const handleChangeName = (event) => {
     setName(event.target.value);
+  };
+  const handleChangeDes = (event) => {
+    setDes(event.target.value);
   };
   const handleChangeCode = (event) => {
     setCode(event.target.value);
@@ -130,7 +156,7 @@ function AddProductForm(props) {
     setFileName("");
     setFile(null);
   };
-  
+
   const getAllBrands = async () => {
     const res = await authService.getAllBrands();
     setBrand(res);
@@ -191,6 +217,13 @@ function AddProductForm(props) {
             onChange={(event) => handleChangePriceSell(event)}
           />
 
+          <TextField
+            required
+            fullWidth
+            label="Mô tả"
+            onChange={(event) => handleChangeDes(event)}
+          />
+
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Hãng sản xuất</InputLabel>
             <Select
@@ -217,7 +250,7 @@ function AddProductForm(props) {
               input={<OutlinedInput label="Màu sắc" />}
             >
               {color.map((item) => (
-                <MenuItem key={item.id} value={item.code}>
+                <MenuItem key={item.id} value={item.id}>
                   {item.name}
                 </MenuItem>
               ))}
@@ -233,16 +266,11 @@ function AddProductForm(props) {
               setSizeSelect(newValue);
             }}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Size"
-                placeholder="sizes"
-              />
+              <TextField {...params} label="Size" placeholder="sizes" />
             )}
           />
 
-
-        <Autocomplete
+          <Autocomplete
             multiple
             options={category}
             getOptionLabel={(option) => option.name}
@@ -258,24 +286,13 @@ function AddProductForm(props) {
               />
             )}
           />
-
-          <Box mt={3} item className={classes.uploadFile}>
-            <Button variant="contained" component="label" size="small">
-              Upload
-              <input
-                hidden
-                accept="image/*"
-                multiple
-                type="file"
-                onChange={handleFile}
-              />
-            </Button>
-            <Typography>
-              {fileName ? fileName : "***"}{" "}
-              <AiFillDelete onClick={() => removeFile()} />
-            </Typography>
-          </Box>
           <Box display={"flex"} justifyContent={"flex-end"} py={3} gap={2}>
+            <input
+              type="file"
+              onChange={(event) => {
+                uploadFile(event.target.files[0]);
+              }}
+            />
             <Button
               variant="contained"
               color="error"
@@ -284,12 +301,13 @@ function AddProductForm(props) {
             >
               Thoát
             </Button>
+
             <Button
               type="submit"
               variant="contained"
               color="success"
               size="medium"
-              onClick={(event)=>handleSubmit(event)}
+              onClick={handleSubmit}
             >
               Thêm sản phẩm
             </Button>

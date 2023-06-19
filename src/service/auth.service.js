@@ -175,15 +175,38 @@ export class AuthService extends BaseService {
 
   //save product
   async createProduct(formData) {
-  //  console.log(formData.get("product"));
     try {
       const url = "http://localhost:8088/product";
       const response = await fetch(`${url}`, {
         method: "POST",
         headers: {
-          'Content-Type': 'multipart/form-data'
+          "Content-Type": "application/json",
         },
-        body: formData,
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return data;
+      } else {
+        console.error("Lỗi:", response.statusText);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //updateProduct 
+  async updateProduct(updateProduct,id) {
+    try {
+      const url = `http://localhost:8088/product/${id}`;
+      const response = await fetch(`${url}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateProduct),
       });
 
       if (response.ok) {
@@ -264,8 +287,123 @@ export class AuthService extends BaseService {
     }
   }
 
+  //searchProductByName
+  async searchProductByName(productName) {
+    try {
+      const { data } = await this.httpClient.get(`/product/search?keyword=${productName}`);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-  
+   //getOrderByMonth
+   async getOrderByMonth(month) {
+    try {
+      const { data } = await this.httpClient.get(`/order/orderbymonth?month=${month}`);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+     //getOrderByAllMonth
+     async getOrderByAllMonth() {
+      try {
+        const { data } = await this.httpClient.get(`/order/orderbyallmonth`);
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    //getProductSell
+    async sortProductByQuantitySell() {
+      try {
+        const { data } = await this.httpClient.get(`/product/sortingbyquantitysell`);
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    //getProductDesc findAllProductsOrderByPriceAsc
+    async findAllProductsOrderByPriceDesc(){
+      try {
+        const { data } = await this.httpClient.get(`/product/sortingbypricedesc`);
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    async findAllProductsOrderByPriceAsc(){
+      try {
+        const { data } = await this.httpClient.get(`/product/sortingbyprice`);
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+       //getProductDesc
+       async getAllDetails(){
+        try {
+          const { data } = await this.httpClient.get(`/importdetail`);
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+
+        //save Import
+  async saveImportReceipt(importReceipt) {
+    try {
+      const url = "http://localhost:8088/importreceipt";
+      const response = await fetch(`${url}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(importReceipt),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return data;
+      } else {
+        console.error("Lỗi:", response.statusText);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+       //save ImportDetail
+       async saveImportReceiptDetail(importReceiptDetail) {
+        try {
+          const url = "http://localhost:8088/importdetail";
+          const response = await fetch(`${url}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(importReceiptDetail),
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+            return data;
+          } else {
+            console.error("Lỗi:", response.statusText);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
 
   setToken(accessToken) {
     this.httpClient.setCustomConfigs({

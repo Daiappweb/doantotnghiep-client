@@ -24,16 +24,8 @@ import { visuallyHidden } from "@mui/utils";
 import { authService } from "@/service/auth.service";
 import { useState, useEffect, useMemo } from "react";
 import { IoIosAddCircle } from "react-icons/io";
-import {makeStyles} from "@mui/styles";
-
-const useStyles = makeStyles({
-  approved: {
-    color: 'green',
-  },
-  pending: {
-    color: 'red',
-  },
-});
+import AddUserForm from "@/components/dialog/AddUserForm";
+import DialogApp from "@/components/dialog";
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -64,35 +56,24 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "user",
+    id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Tên tài khoản",
+    label: "Tên thương hiệu",
   },
   {
     id: "code",
     numeric: false,
     disablePadding: false,
-    label: "Mã đơn hàng",
+    label: "Mã thương hiệu",
   },
   {
-    id: "createddate",
+    id: "description",
     numeric: false,
     disablePadding: false,
-    label: "Ngày đặt",
+    label: "Mô tả",
   },
-  {
-    id: "isDeleted",
-    numeric: false,
-    disablePadding: false,
-    label: "Trạng thái",
-  },
-  {
-    id: "totalamount",
-    numeric: false,
-    disablePadding: false,
-    label: "Tổng số tiền",
-  },
+  
 ];
 
 function EnhancedTableHead(props) {
@@ -159,57 +140,69 @@ EnhancedTableHead.propTypes = {
 
 function EnhancedTableToolbar(props) {
   const { numSelected } = props;
-
+  const [open, setOpen] = useState(false);
+  const handleAddProduct = () => {
+    setOpen(true);
+  };
+  const handleClosePopup = () => {
+    setOpen(false);
+  };
   return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Tất cả đơn hàng
-        </Typography>
-      )}
-      <IconButton>
-        <IoIosAddCircle size={24} />
-      </IconButton>
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
+    <Box>
+      <DialogApp openPopup={open} handleClosePopup={handleClosePopup}>
+        <AddUserForm onClosePopup={handleClosePopup}></AddUserForm>
+      </DialogApp>
+      <Toolbar
+        sx={{
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          ...(numSelected > 0 && {
+            bgcolor: (theme) =>
+              alpha(
+                theme.palette.primary.main,
+                theme.palette.action.activatedOpacity
+              ),
+          }),
+        }}
+      >
+        {numSelected > 0 ? (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            color="inherit"
+            variant="subtitle1"
+            component="div"
+          >
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+          >
+            Tất cả nhà thương hiệu
+          </Typography>
+        )}
+
+        <IconButton>
+          <IoIosAddCircle size={24} onClick={() => handleAddProduct()} />
+        </IconButton>
+        {numSelected > 0 ? (
+          <Tooltip title="Delete">
+            <IconButton>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Filter list">
+            <IconButton>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Toolbar>
+    </Box>
   );
 }
 
@@ -217,42 +210,34 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function Order() {
+export default function Brand(props) {
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("createddate");
+  const [orderBy, setOrderBy] = useState("name");
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [dataRow, setDataRow] = useState([]);
-  const classes = useStyles();
-  function createData(id, user, code,isDeleted, createddate, totalamount) {
+
+  function createData(id, name, code, description) {
     return {
       id,
-      user,
+      name,
       code,
-      isDeleted,
-      createddate,
-      totalamount,
+      description
     };
   }
 
   const loadUsers = async () => {
     try {
-      const orders = await authService.loadOrders();
-      console.log("orders ==== ", orders);
+      // const res = await authService.getAllImage();
+      const res = await authService.getAllBrands();
+      const users = res;
+      console.log("products ==== ", users);
       const rowRes = [];
-      for (const item of orders) {
-        const date = new Date(item.createdDate);
+      for (const item of users) {
         rowRes.push(
-          createData(
-            item.id,
-            item.createdByUser,
-            item.code,
-            item.isDeleted,
-            date.toUTCString(),
-            item.totalAmount
-          )
+          createData(item.id, item.name, item.code, item.description)
         );
       }
       console.log("products change === ", rowRes);
@@ -346,13 +331,13 @@ export default function Order() {
             />
             <TableBody>
               {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.user);
+                const isItemSelected = isSelected(row.name);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.user)}
+                    onClick={(event) => handleClick(event, row.name)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -375,14 +360,11 @@ export default function Order() {
                       scope="row"
                       padding="none"
                     >
-                      {row.user}
+                      {row.name}
                     </TableCell>
                     <TableCell align="left">{row.code}</TableCell>
-                    <TableCell align="left">{row.createddate}</TableCell>
-                    <TableCell sx={{
-                      color:row.isDeleted === 1 ?"green":"red"
-                    }}align="left">{row.isDeleted==1?"Đã duyệt":"Chờ duyệt"}</TableCell>
-                    <TableCell align="left">{row.totalamount}</TableCell>
+                    <TableCell align="left">{row.description}</TableCell>
+                   
                     {/* <TableCell align="right">{row.sell}</TableCell> */}
                   </TableRow>
                 );

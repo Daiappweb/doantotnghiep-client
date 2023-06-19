@@ -199,7 +199,7 @@ function HeaderLayout() {
           <Link to="/">TRANG CHỦ</Link>
         </p>
         <p>
-          <Link to="/">SẢN PHẨM</Link>
+          <Link to="/home/product">SẢN PHẨM</Link>
         </p>
         <p>
           <Link to="/">GIỚI THIỆU</Link>

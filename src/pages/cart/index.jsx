@@ -14,7 +14,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, TextField } from "@mui/material";
+import { Alert, Box, Button, Grid, Snackbar, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import { authService } from "@/service/auth.service";
 
@@ -43,7 +43,10 @@ function CartPage(props) {
   const [quantityDefault,setQuantityDefault] = useState(1);
   const [quantityItem,setQuantityItem] = useState(0);
   const [totalOrder,setTotalOrder] = useState(0);
-
+  const [addr,setAdrr] = useState('');
+  const [phone,setPhone] = useState('');
+  const [name,setName] = useState('');
+  const [openSnackbar,setOpenSnackbar] = useState(false);
   //lay products tu localStorage va gan cho product
   const getDataFromLocalStorage = async () => {
     const res = JSON.parse(localStorage.getItem("products"))||[];
@@ -109,6 +112,17 @@ function CartPage(props) {
     setTotalOrder(total);
   }
 
+  //change data order
+  const handleChangeAddress=(event)=>{
+    setAdrr(event.target.value);
+  }
+  const handleChangeName=(event)=>{
+    setName(event.target.value);
+  }
+  const handleChangePhone=(event)=>{
+    setPhone(event.target.value);
+  }
+
   useEffect(() => {
     getDataFromLocalStorage();
   }, []);
@@ -117,13 +131,26 @@ function CartPage(props) {
     changeTotalOrder();
   },[product])
  
-  const handlePayment=async()=>{
-    //save invoice
 
-    const invoice = {
-     totalAmount: totalOrder 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
     }
 
+    setOpenSnackbar(false);
+  };
+
+  const handlePayment=async()=>{
+    //save invoice
+    const user = JSON.parse(localStorage.getItem("user"));
+    const invoice = {
+     totalAmount: totalOrder,
+     userReceive:name,
+     phone:phone,
+     addressRecive:addr,
+     createdByUser:user.userName,
+    updatedByUser:user.userName,
+    }
     const order = await authService.saveOrder(invoice);
     console.log("order === ",order.id);
 
@@ -136,14 +163,39 @@ function CartPage(props) {
       let orderProduct = {
         price:item.price,
         quantity:item.quantity,
-        totalItem:item.price*item.quantity
+        size:item.size,
+        totalItem:item.price*item.quantity,
+        createdByUser:user.userName,
+        updatedByUser:user.userName,
       }
-      const result = authService.saveOrderProduct(orderProduct,item.idProduct,order.id);
-      console.log("result === ",result);
-      
+      const result = await authService.saveOrderProduct(orderProduct,item.idProduct,order.id);
+      const productItem = await authService.getProductById(item.idProduct);
+      console.log("productItem= ",productItem);
+      // update quantitysell
+      let data = {
+        id:productItem.id,
+        name: productItem.name,
+        code: productItem.code,
+        quantity: productItem.quantity,
+        importPrice:productItem.importPrice,
+        description:productItem.description,
+        price:productItem.price,
+        inStock:productItem.inStock,
+        quantitySell:parseInt(item.quantity),
+        imageSrc: productItem.imageSrc,
+        brand: productItem.brand,
+        colors: productItem.colors,
+        categories: productItem.colors,
+        createdByUser:user.userName,
+        updatedByUser:user.userName,
+        sizes: productItem.sizes,
+      };
+      console.log("data send === ",data);
+      const resultProductUpdated = await authService.updateProduct(data,item.idProduct);
+      console.log("resultProductUpdated === ",resultProductUpdated);
+      setOpenSnackbar(true);
+      localStorage.removeItem('products');
     }
-
-
   }
 
   return (
@@ -171,7 +223,7 @@ function CartPage(props) {
                       <Box className="flex items-center gap-4">
                         <img
                           className="w-20 h-20 cursor-pointer"
-                          src={item.images[0].description}
+                          src={item.imageSrc}
                           alt="img"
                         />
                         <Box className="flex gap-1 flex-col">
@@ -230,13 +282,11 @@ function CartPage(props) {
             </Box>
             <Box className="mt-6 flex flex-col gap-6">
               <Box className="flex gap-3 ">
-                <TextField name="username" label="Tên Tài Khoản" fullWidth />
-                <TextField name="fullName" label="Họ tên" fullWidth />
+                <TextField name="fullName" label="Họ tên" fullWidth onChange={(event)=>{handleChangeName(event)}}/>
               </Box>
-              <TextField name="location" label="Địa chỉ" fullWidth />
+              <TextField name="location" label="Địa chỉ" fullWidth onChange={(event)=>{handleChangeAddress(event)}}/>
               <Box className="flex gap-3 ">
-                <TextField name="email" label="Email" fullWidth />
-                <TextField name="phoneNumber" label="Số điện thoại" fullWidth />
+                <TextField name="phoneNumber" label="Số điện thoại" fullWidth onChange={(event)=>{handleChangePhone(event)}}/>
               </Box>
             </Box>
           </Box>
@@ -296,6 +346,11 @@ function CartPage(props) {
           </Box>
         </Grid>
       </Grid>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+          Đặt hàng thành công!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

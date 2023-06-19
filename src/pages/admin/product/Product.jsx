@@ -72,7 +72,13 @@ const headCells = [
     id: 'quantity',
     numeric: true,
     disablePadding: false,
-    label: 'Số lượng',
+    label: 'Số lượng bán',
+  },
+  {
+    id: 'inStock',
+    numeric: true,
+    disablePadding: false,
+    label: 'Số lượng trong kho',
   },
   {
     id: 'importreceipt',
@@ -96,7 +102,7 @@ function EnhancedTableHead(props) {
   };
 
   return (
-    <TableHead>
+      <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
           <Checkbox
@@ -230,12 +236,13 @@ export default function Product(props) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [dataRow,setDataRow] = useState([]);
   const {openPopup} = props;
-  function createData(id,name, code, quantity, importreceipt, sell) {
+  function createData(id,name, code, quantity,inStock, importreceipt, sell) {
     return {
       id,
       name,
       code,
       quantity,
+      inStock,
       importreceipt,
       sell,
     };
@@ -246,6 +253,7 @@ export default function Product(props) {
     try{
       // const res = await authService.getAllImage();
       const res = await authService.getAllProdcut();
+      console.log(res);
       const products = res.products;
       console.log("products ==== ",products);
       const rowRes = [];
@@ -254,8 +262,9 @@ export default function Product(props) {
           item.id,
           item.name,
           item.code,
-          item.quantity,
-          item.price,
+          item.quantitySell,
+          item.inStock,
+          item.importPrice,
           item.price
         ));
       }
@@ -334,6 +343,8 @@ export default function Product(props) {
       ),
     [order, orderBy, page, rowsPerPage],
   );
+
+  console.log(dataRow)
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -385,8 +396,9 @@ export default function Product(props) {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell align="right">{row.code}</TableCell>
+                    <TableCell align="left">{row.code}</TableCell>
                     <TableCell align="right">{row.quantity}</TableCell>
+                    <TableCell align="right">{row.inStock}</TableCell>
                     <TableCell align="right">{row.importreceipt}</TableCell>
                     <TableCell align="right">{row.sell}</TableCell>
                   </TableRow>

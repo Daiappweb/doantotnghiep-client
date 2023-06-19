@@ -18,14 +18,17 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useState } from "react";
 import Product from "@/pages/admin/product/Product";
-import { FaShoppingCart, FaUsers,FaHome,FaShopify ,FaFileInvoice} from "react-icons/fa";
+import { FaShoppingCart, FaUsers,FaHome,FaShopify ,FaFileInvoice, FaBrain} from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import User from "@/pages/admin/user/User";
 import Order from "@/pages/admin/order/Order";
 import ImportReceipt from "@/pages/admin/importreceipt/ImportReceipt";
 import AdminPage from "@/pages/admin";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Brand from "@/pages/admin/brand/Brand";
+import DashboardPage from "@/pages/admin/dasboard/Dashboard";
+
 
 const drawerWidth = 240;
 
@@ -112,7 +115,9 @@ export default function SideBarAdminLayout() {
   const logoutApp = ()=>{
     navigate("/auth/login");
   }
-
+  const location = useLocation();
+  const { pathname, hash } = location;
+  console.log(location)
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -130,9 +135,6 @@ export default function SideBarAdminLayout() {
           >
             <MenuIcon />
           </IconButton>
-          {/* <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
-          </Typography> */}
           <img
             className="w-20 h-10 sm:w-36 sm:h-14"
             src="/assets/images/logo.png"
@@ -152,9 +154,10 @@ export default function SideBarAdminLayout() {
         </DrawerHeader>
         <Divider />
         <List>
+          <Link to="/admin#home">
           <ListItem
             disablePadding
-            sx={{ display: "block" }}
+            sx={{ display: "block"}}
             onClick={() => setMenuData("Home")}
           >
             <ListItemButton
@@ -171,12 +174,14 @@ export default function SideBarAdminLayout() {
                   justifyContent: "center",
                 }}
               >
-                <FaHome />
+                <FaHome color={hash ==="#home" ? "#007FFF" : ""}/>
               </ListItemIcon>
-              <ListItemText primary="Trang chủ" sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText primary="Trang chủ" sx={{ opacity: open ? 1 : 0 ,color:hash ==="#home" ? "#007FFF" : ""}} />
             </ListItemButton>
           </ListItem>
+          </Link>
           <Divider />
+          <Link to="/admin#product">
           <ListItem
             disablePadding
             sx={{ display: "block" }}
@@ -196,12 +201,43 @@ export default function SideBarAdminLayout() {
                   justifyContent: "center",
                 }}
               >
-                <FaShopify />
+                <FaShopify color={hash ==="#product" ? "#007FFF" : ""} />
               </ListItemIcon>
-              <ListItemText primary="Sản phẩm" sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText primary="Sản phẩm" sx={{ opacity: open ? 1 : 0, color: hash ==="#product" ? "#007FFF" : "" }} />
             </ListItemButton>
           </ListItem>
+          </Link>
           <Divider />
+          <Link to="/admin#brand">
+          <ListItem
+            disablePadding
+            sx={{ display: "block" }}
+            onClick={() => setMenuData("Brands")}
+          >
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
+                }}
+              >
+                <FaBrain  color={hash ==="#brand" ? "#007FFF" : ""} />
+              </ListItemIcon>
+              <ListItemText primary="Thương hiệu" sx={{ opacity: open ? 1 : 0, color: hash ==="#brand" ? "#007FFF" : ""   }} />
+            </ListItemButton>
+          </ListItem>
+          </Link>
+         
+
+          <Divider />
+          <Link to="/admin#user">
           <ListItem
             disablePadding
             sx={{ display: "block" }}
@@ -221,12 +257,14 @@ export default function SideBarAdminLayout() {
                   justifyContent: "center",
                 }}
               >
-                <FaUsers />
+                <FaUsers color={hash ==="#user" ? "#007FFF" : ""} />
               </ListItemIcon>
-              <ListItemText primary="Người dùng" sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText primary="Người dùng" sx={{ opacity: open ? 1 : 0 , color: hash ==="#user" ? "#007FFF" : "" }} />
             </ListItemButton>
           </ListItem>
+          </Link>
           <Divider />
+          <Link to="/admin#order">
           <ListItem
             disablePadding
             sx={{ display: "block" }}
@@ -246,12 +284,14 @@ export default function SideBarAdminLayout() {
                   justifyContent: "center",
                 }}
               >
-                <FaShoppingCart />
+                <FaShoppingCart color={hash ==="#order" ? "#007FFF" : ""}/>
               </ListItemIcon>
-              <ListItemText primary="Đơn hàng" sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText primary="Đơn hàng" sx={{ opacity: open ? 1 : 0,color:hash ==="#order" ? "#007FFF" : "" }} />
             </ListItemButton>
           </ListItem>
+          </Link>
           <Divider />
+          <Link to="/admin#importreceipt">
           <ListItem
             disablePadding
             sx={{ display: "block" }}
@@ -271,14 +311,15 @@ export default function SideBarAdminLayout() {
                   justifyContent: "center",
                 }}
               >
-                <FaFileInvoice />
+                <FaFileInvoice color={hash ==="#importreceipt" ? "#007FFF" : ""}/>
               </ListItemIcon>
               <ListItemText
                 primary="Nhập hàng"
-                sx={{ opacity: open ? 1 : 0 }}
+                sx={{ opacity: open ? 1 : 0 ,color:hash ==="#importreceipt" ? "#007FFF" : ""}}
               />
             </ListItemButton>
           </ListItem>
+          </Link>
           <Divider />
           <ListItem
             disablePadding
@@ -316,8 +357,8 @@ export default function SideBarAdminLayout() {
         {menuData == "Users" && <User />}
         {menuData == "Orders" && <Order />}
         {menuData == "Import" && <ImportReceipt />}
-        {menuData == "Home" && <AdminPage />}
-        {/* {menuData == "Logout" && <Link to='/auth/login'></Link>} */}
+        {menuData == "Home" && <DashboardPage/>}
+        {menuData == "Brands"&&<Brand/>}
       </Box>
     </Box>
   );

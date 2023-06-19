@@ -24,7 +24,7 @@ function ShoesItem({ shoes }) {
   return (
     <ShoesWrapper>
       <Link to={`/shoes/${shoes.id}`}>
-        <img src={shoes.images[0].description} alt="img" />
+        <img src={shoes.imageSrc} alt="img" />
       </Link>
       <Box display="flex" flexDirection="column" p={2}>
         <Link to={`/shoes/${shoes.id}`}>
@@ -36,6 +36,7 @@ function ShoesItem({ shoes }) {
           </p>
           <Rating readOnly name="half-rating" defaultValue={4.5} size="small" precision={0.5} />
         </Box>
+        <Typography align='right'>Đã bán: {shoes.quantitySell}</Typography>
       </Box>
     </ShoesWrapper>
   );

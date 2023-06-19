@@ -9,6 +9,7 @@ import CartPage from '@/pages/cart';
 import HomePage from '@/pages/home';
 import SearchPage from '@/pages/search';
 import ShoesDetailPage from '@/pages/shoes-detail';
+import ProductClient from '@/pages/products/ProductClient';
 export const routes = [
   {
     path: '/',
@@ -63,4 +64,8 @@ export const routes = [
     component: AdminRegisterPage,
     layout: 'AdminLayout',
   },
+  {
+    path: '/home/product',
+    component: ProductClient,
+  }
 ];

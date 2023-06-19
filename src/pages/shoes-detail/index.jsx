@@ -8,6 +8,7 @@ import {
   TextField,
   Rating,
   withStyles,
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -27,7 +28,7 @@ const ShoesWrapper = styled(Grid)(() => ({
 function ShoesDetailPage(shoes,classes) {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-
+  const [sizeSelected,setSizeSelected] = useState(null);
   const param = useParams();
   const pId = param.id;
   console.log("pid === ", pId);
@@ -39,6 +40,13 @@ function ShoesDetailPage(shoes,classes) {
       console.log(error);
     }
   };
+
+  //changeSize
+  const handleSizeClick = (size) => {
+    setSizeSelected(size);
+    console.log("sizeSelected === ",size);
+  };
+
   const changeQuantity = (event) => {
     const value = event.target.value;
     console.log("quantity === ", value);
@@ -60,8 +68,8 @@ function ShoesDetailPage(shoes,classes) {
         price:product.price,
         name:product.name,
         color:product.colors[0],
-        size:product.sizes[0],
-        image:product.images[0].description
+        size:sizeSelected,
+        image:product.imageSrc
       });
     }else{
       products[index].quantity = quantity;
@@ -81,11 +89,13 @@ function ShoesDetailPage(shoes,classes) {
 
 
   return (
+    
     <Box>
+      
       {product ? (
         <ShoesWrapper container spacing={3}>
           <Grid item xs={12} sm={5}>
-            <img src={product.images[0].description} alt="img" />
+            <img src={product.imageSrc} alt="img" />
           </Grid>
           <Grid item xs={12} sm={7}>
             <Stack spacing={2}>
@@ -96,6 +106,16 @@ function ShoesDetailPage(shoes,classes) {
                   ₫
                 </span>
               </p>
+            
+              <Box display="flex" alignItems="center" gap={2}>
+                <p className="text-[#777]">
+                  Đã bán:{" "}
+                  <span className="text-black">
+                    {product.quantitySell}
+                  </span>
+                </p>
+              </Box>
+
               <Box className="flex items-center">
                 <p className="text-[#777] mr-2">Đánh giá:</p>
                 <span className="underline mr-1 text-[#ecab14]">{4}</span>
@@ -115,6 +135,7 @@ function ShoesDetailPage(shoes,classes) {
                   </span>
                 </p>
               </Box>
+
               <Box display="flex" alignItems="center" gap={2}>
                 <p className="text-[#777]">
                   Thương hiệu:{" "}
@@ -134,7 +155,11 @@ function ShoesDetailPage(shoes,classes) {
                 <p>Kích thước: </p>
                 <Box display="flex" gap={2}>
                   {product.sizes.map((size, index) => (
-                    <Button key={index} variant="outlined">
+                    <Button key={index}
+                            variant="outlined"
+                            sx={{backgroundColor:sizeSelected === size.code?"green":"none"}}
+                            onClick={()=>handleSizeClick(size.code)}
+                            >
                       {size.name}
                     </Button>
                   ))}
